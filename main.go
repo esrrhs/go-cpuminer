@@ -77,7 +77,7 @@ func main() {
 
 	ms := make([]*Miner, *thread)
 	for i := 0; i < *thread; i++ {
-		m, err := NewMiner(*server, *username, *password, *name)
+		m, err := NewMiner(*server, *username, *password, *name+strconv.Itoa(i))
 		if err != nil {
 			loggo.Error("Error initializing miner: %v", err)
 			return
