@@ -180,7 +180,7 @@ func StratumConn(pool, user, pass string) (*Stratum, error) {
 	var conn net.Conn
 	var err error
 
-	loggo.Info("Stratum pool start connect %v->%v", conn.LocalAddr(), conn.RemoteAddr())
+	loggo.Info("Stratum pool start connect %v", pool)
 
 	conn, err = net.Dial("tcp", pool)
 	if err != nil {
@@ -276,7 +276,6 @@ func (s *Stratum) Listen() {
 		loggo.Debug("Stratum recv %v", strings.TrimSuffix(result, "\n"))
 		resp, err := s.Unmarshal([]byte(result))
 		if err != nil {
-			loggo.Error("Stratum Unmarshal fail %v", err)
 			continue
 		}
 
@@ -481,6 +480,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 
 	err := json.Unmarshal(blob, &objmap)
 	if err != nil {
+		loggo.Error("Stratum Unmarshal fail %v", err)
 		return nil, err
 	}
 	// decode command
@@ -491,6 +491,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 	}
 	err = json.Unmarshal(objmap["id"], &id)
 	if err != nil {
+		loggo.Error("Stratum Unmarshal fail %v", err)
 		return nil, err
 	}
 	if id == s.authID {
@@ -502,22 +503,26 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		)
 		err := json.Unmarshal(blob, &objmap)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		resp := &BasicReply{}
 
 		err = json.Unmarshal(objmap["id"], &id)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		resp.ID = id
 
 		err = json.Unmarshal(objmap["result"], &result)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		err = json.Unmarshal(objmap["error"], &errorHolder)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		resp.Result = result
@@ -525,10 +530,12 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		if errorHolder != nil {
 			errN, ok := errorHolder[0].(float64)
 			if !ok {
+				loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 				return nil, errJsonType
 			}
 			errS, ok := errorHolder[1].(string)
 			if !ok {
+				loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 				return nil, errJsonType
 			}
 			resp.Error.ErrNum = uint64(errN)
@@ -542,6 +549,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		var resi []interface{}
 		err := json.Unmarshal(objmap["result"], &resi)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		resp := &SubscribeReply{}
@@ -549,22 +557,26 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		var objmap2 map[string]json.RawMessage
 		err = json.Unmarshal(blob, &objmap2)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 
 		var resJS []json.RawMessage
 		err = json.Unmarshal(objmap["result"], &resJS)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 
 		if len(resJS) == 0 {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 
 		var msgPeak []interface{}
 		err = json.Unmarshal(resJS[0], &msgPeak)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 
@@ -576,6 +588,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 				var innerMsg []string
 				err = json.Unmarshal(resJS[0], &innerMsg)
 				if err != nil {
+					loggo.Error("Stratum Unmarshal fail %v", err)
 					return nil, err
 				}
 				resp.SubscribeID = innerMsg[1]
@@ -583,6 +596,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 				var innerMsg [][]string
 				err = json.Unmarshal(resJS[0], &innerMsg)
 				if err != nil {
+					loggo.Error("Stratum Unmarshal fail %v", err)
 					return nil, err
 				}
 
@@ -616,22 +630,26 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		)
 		err := json.Unmarshal(blob, &objmap)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		resp := &BasicReply{}
 
 		err = json.Unmarshal(objmap["id"], &id)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		resp.ID = id
 
 		err = json.Unmarshal(objmap["result"], &result)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		err = json.Unmarshal(objmap["error"], &errorHolder)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		resp.Result = result
@@ -639,10 +657,12 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		if errorHolder != nil {
 			errN, ok := errorHolder[0].(float64)
 			if !ok {
+				loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 				return nil, errJsonType
 			}
 			errS, ok := errorHolder[1].(string)
 			if !ok {
+				loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 				return nil, errJsonType
 			}
 			resp.Error.ErrNum = uint64(errN)
@@ -661,21 +681,25 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		nres := &NotifyRes{}
 		jobID, ok := resi[0].(string)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		nres.JobID = jobID
 		hash, ok := resi[1].(string)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		nres.Hash = hash
 		genTX1, ok := resi[2].(string)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		nres.GenTX1 = genTX1
 		genTX2, ok := resi[3].(string)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		nres.GenTX2 = genTX2
@@ -683,21 +707,25 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		//nres.MerkleBranches = resi[4].([]string)
 		blockVersion, ok := resi[5].(string)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		nres.BlockVersion = blockVersion
 		nbits, ok := resi[6].(string)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		nres.Nbits = nbits
 		ntime, ok := resi[7].(string)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		nres.Ntime = ntime
 		cleanJobs, ok := resi[8].(bool)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		nres.CleanJobs = cleanJobs
@@ -707,15 +735,18 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		var resi []interface{}
 		err := json.Unmarshal(objmap["params"], &resi)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 
 		difficulty, ok := resi[0].(float64)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		s.Target, err = DiffToTarget(difficulty, mainPowLimit)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		s.Diff = difficulty
@@ -731,10 +762,12 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		var resi []interface{}
 		err := json.Unmarshal(objmap["result"], &resi)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		msg, ok := resi[0].(string)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		nres := &StratumMsg{}
@@ -749,6 +782,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		var id uint64
 		err = json.Unmarshal(objmap["id"], &id)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		nres.Method = method
@@ -760,6 +794,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		var id uint64
 		err = json.Unmarshal(objmap["id"], &id)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		nres.Method = method
@@ -768,23 +803,28 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		var resi []interface{}
 		err := json.Unmarshal(objmap["params"], &resi)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 
 		if len(resi) < 3 {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		hostname, ok := resi[0].(string)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		p, ok := resi[1].(float64)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		port := strconv.Itoa(int(p))
 		w, ok := resi[2].(float64)
 		if !ok {
+			loggo.Error("Stratum Unmarshal fail %v", errJsonType)
 			return nil, errJsonType
 		}
 		wait := strconv.Itoa(int(w))
@@ -797,6 +837,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		resp := &StratumRsp{}
 		err := json.Unmarshal(blob, &resp)
 		if err != nil {
+			loggo.Error("Stratum Unmarshal fail %v", err)
 			return nil, err
 		}
 		return resp, nil
