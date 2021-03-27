@@ -271,7 +271,7 @@ func (s *Stratum) Listen() {
 			continue
 		}
 
-		loggo.Info("Stratum recv %v", strings.TrimSuffix(result, "\n"))
+		loggo.Debug("Stratum recv %v", strings.TrimSuffix(result, "\n"))
 		resp, err := s.Unmarshal([]byte(result))
 		if err != nil {
 			loggo.Error("Stratum Unmarshal fail %v", err)
@@ -394,6 +394,8 @@ func (s *Stratum) handleNotifyRes(resp interface{}) {
 	s.PoolWork.NtimeDelta = parsedNtime - time.Now().Unix()
 	s.PoolWork.Clean = nResp.CleanJobs
 	s.PoolWork.NewWork = true
+
+	loggo.Info("Stratum recv new job %v %v %v", s.PoolWork.JobID, s.PoolWork.Hash, s.PoolWork.Height)
 }
 
 func (s *Stratum) handleSubscribeReply(resp interface{}) {
