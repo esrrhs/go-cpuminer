@@ -277,14 +277,13 @@ func (s *Stratum) Listen() {
 			loggo.Error("Stratum Unmarshal fail %v", err)
 			continue
 		}
-		loggo.Info("Stratum recv \n", common.StructToTable(&resp))
 
 		switch resp.(type) {
 		case *BasicReply:
 			s.handleBasicReply(resp)
-		case StratumMsg:
+		case *StratumMsg:
 			s.handleStratumMsg(resp)
-		case NotifyRes:
+		case *NotifyRes:
 			s.handleNotifyRes(resp)
 		case *SubscribeReply:
 			s.handleSubscribeReply(resp)
@@ -317,8 +316,7 @@ func (s *Stratum) handleBasicReply(resp interface{}) {
 }
 
 func (s *Stratum) handleStratumMsg(resp interface{}) {
-	nResp := resp.(StratumMsg)
-	loggo.Info("Stratum handleStratumMsg %v %v", nResp.Method, nResp.ID)
+	nResp := resp.(*StratumMsg)
 	// Too much is still handled in unmarshaler.  Need to
 	// move stuff other than unmarshalling here.
 	switch nResp.Method {
@@ -326,7 +324,7 @@ func (s *Stratum) handleStratumMsg(resp interface{}) {
 		loggo.Info("Stratum handleStratumMsg show_message: %v", nResp.Params)
 
 	case "client.reconnect":
-		loggo.Debug("Reconnect requested")
+		loggo.Info("Stratum Reconnect requested")
 		wait, err := strconv.Atoi(nResp.Params[2])
 		if err != nil {
 			loggo.Error("Stratum handleStratumMsg reconnect: %v", err)
@@ -342,7 +340,7 @@ func (s *Stratum) handleStratumMsg(resp interface{}) {
 		}
 
 	case "client.get_version":
-		loggo.Debug("get_version request received.")
+		loggo.Info("Stratum get_version request received.")
 		msg := StratumMsg{
 			Method: nResp.Method,
 			ID:     nResp.ID,
@@ -363,11 +361,14 @@ func (s *Stratum) handleStratumMsg(resp interface{}) {
 			loggo.Error("Stratum handleStratumMsg get_version: %v", err)
 			return
 		}
+
+	case "mining.set_difficulty":
+		loggo.Info("Stratum difficulty set to %v", s.Diff)
 	}
 }
 
 func (s *Stratum) handleNotifyRes(resp interface{}) {
-	nResp := resp.(NotifyRes)
+	nResp := resp.(*NotifyRes)
 	s.PoolWork.JobID = nResp.JobID
 	s.PoolWork.CB1 = nResp.GenTX1
 	heightHex := nResp.GenTX1[186:188] + nResp.GenTX1[184:186]
@@ -399,7 +400,7 @@ func (s *Stratum) handleSubscribeReply(resp interface{}) {
 	nResp := resp.(*SubscribeReply)
 	s.PoolWork.ExtraNonce1 = nResp.ExtraNonce1
 	s.PoolWork.ExtraNonce2Length = nResp.ExtraNonce2Length
-	loggo.Debug("Stratum handleSubscribeReply Subscribe reply received")
+	loggo.Info("Stratum handleSubscribeReply Subscribe reply received")
 }
 
 // Auth sends a message to the pool to authorize a worker.
@@ -555,7 +556,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 			return nil, err
 		}
 
-		if msgPeak[0] != nil {
+		if msgPeak != nil {
 			// The pools do not all agree on what this message looks like
 			// so we need to actually look at it before unmarshalling for
 			// real so we can use the right form.  Yuck.
@@ -645,7 +646,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
-		var nres = NotifyRes{}
+		nres := &NotifyRes{}
 		jobID, ok := resi[0].(string)
 		if !ok {
 			return nil, errJsonType
@@ -706,13 +707,12 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 			return nil, err
 		}
 		s.Diff = difficulty
-		var nres = StratumMsg{}
+		nres := &StratumMsg{}
 		nres.Method = method
 		diffStr := strconv.FormatFloat(difficulty, 'E', -1, 32)
 		var params []string
 		params = append(params, diffStr)
 		nres.Params = params
-		loggo.Info("Stratum difficulty set to %v", difficulty)
 		return nres, nil
 
 	case "client.show_message":
@@ -725,7 +725,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		if !ok {
 			return nil, errJsonType
 		}
-		var nres = StratumMsg{}
+		nres := &StratumMsg{}
 		nres.Method = method
 		var params []string
 		params = append(params, msg)
@@ -733,7 +733,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		return nres, nil
 
 	case "client.get_version":
-		var nres = StratumMsg{}
+		nres := &StratumMsg{}
 		var id uint64
 		err = json.Unmarshal(objmap["id"], &id)
 		if err != nil {
@@ -744,7 +744,7 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 		return nres, nil
 
 	case "client.reconnect":
-		var nres = StratumMsg{}
+		nres := &StratumMsg{}
 		var id uint64
 		err = json.Unmarshal(objmap["id"], &id)
 		if err != nil {
@@ -911,8 +911,8 @@ func (s *Stratum) PrepWork() error {
 
 // PrepSubmit formats a mining.sumbit message from the solved work.
 func (s *Stratum) PrepSubmit(data []byte) (Submit, error) {
-	loggo.Debug("Stratum got valid work to submit %x", data)
-	loggo.Debug("Stratum got valid work hash %v", chainhash.HashH(data[0:180]))
+	loggo.Info("Stratum got valid work to submit %x", data)
+	loggo.Info("Stratum got valid work hash %v", chainhash.HashH(data[0:180]))
 	data2 := make([]byte, 180)
 	copy(data2, data[0:180])
 
