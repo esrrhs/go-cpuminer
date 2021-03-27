@@ -555,35 +555,37 @@ func (s *Stratum) Unmarshal(blob []byte) (interface{}, error) {
 			return nil, err
 		}
 
-		// The pools do not all agree on what this message looks like
-		// so we need to actually look at it before unmarshalling for
-		// real so we can use the right form.  Yuck.
-		if msgPeak[0] == "mining.notify" {
-			var innerMsg []string
-			err = json.Unmarshal(resJS[0], &innerMsg)
-			if err != nil {
-				return nil, err
-			}
-			resp.SubscribeID = innerMsg[1]
-		} else {
-			var innerMsg [][]string
-			err = json.Unmarshal(resJS[0], &innerMsg)
-			if err != nil {
-				return nil, err
-			}
-
-			for i := 0; i < len(innerMsg); i++ {
-				if innerMsg[i][0] == "mining.notify" {
-					resp.SubscribeID = innerMsg[i][1]
+		if msgPeak[0] != nil {
+			// The pools do not all agree on what this message looks like
+			// so we need to actually look at it before unmarshalling for
+			// real so we can use the right form.  Yuck.
+			if msgPeak[0] == "mining.notify" {
+				var innerMsg []string
+				err = json.Unmarshal(resJS[0], &innerMsg)
+				if err != nil {
+					return nil, err
 				}
-				if innerMsg[i][0] == "mining.set_difficulty" {
-					// Not all pools correctly put something
-					// in here so we will ignore it (we
-					// already have the default value of 1
-					// anyway and pool can send a new one.
-					// dcr.coinmine.pl puts something that
-					// is not a difficulty here which is why
-					// we ignore.
+				resp.SubscribeID = innerMsg[1]
+			} else {
+				var innerMsg [][]string
+				err = json.Unmarshal(resJS[0], &innerMsg)
+				if err != nil {
+					return nil, err
+				}
+
+				for i := 0; i < len(innerMsg); i++ {
+					if innerMsg[i][0] == "mining.notify" {
+						resp.SubscribeID = innerMsg[i][1]
+					}
+					if innerMsg[i][0] == "mining.set_difficulty" {
+						// Not all pools correctly put something
+						// in here so we will ignore it (we
+						// already have the default value of 1
+						// anyway and pool can send a new one.
+						// dcr.coinmine.pl puts something that
+						// is not a difficulty here which is why
+						// we ignore.
+					}
 				}
 			}
 		}
