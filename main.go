@@ -69,6 +69,7 @@ func main() {
 		}
 		timer := time.NewTimer(time.Minute * 20) // 20 minutes
 		go func() {
+			defer common.CrashLog()
 			<-timer.C
 			pprof.WriteHeapProfile(f)
 			f.Close()
@@ -88,6 +89,7 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
+		defer common.CrashLog()
 		<-c
 		loggo.Warn("Got Control+C, exiting...")
 		for i := 0; i < *thread; i++ {
@@ -99,6 +101,7 @@ func main() {
 	for i := 0; i < *thread; i++ {
 		index := i
 		go func() {
+			defer common.CrashLog()
 			defer atomic.AddInt32(&num, -1)
 			ms[index].Run()
 		}()

@@ -175,7 +175,7 @@ func StratumConn(pool, user, pass string) (*Stratum, error) {
 	stratum.cfg.User = user
 	stratum.cfg.Pass = pass
 
-	loggo.Info("New Stratum start Using pool")
+	loggo.Info("Stratum New start Using user %v pass %v pool %v", user, pass, pool)
 
 	var conn net.Conn
 	var err error
@@ -187,6 +187,8 @@ func StratumConn(pool, user, pass string) (*Stratum, error) {
 	stratum.ID = 1
 	stratum.Conn = conn
 	stratum.cfg.Pool = pool
+
+	loggo.Info("Stratum pool connect ok %v->%v", conn.LocalAddr(), conn.RemoteAddr())
 
 	// We will set it for sure later but this really should be the value and
 	// setting it here will prevent so incorrect matches based on the
@@ -214,7 +216,7 @@ func StratumConn(pool, user, pass string) (*Stratum, error) {
 
 	stratum.Started = uint32(time.Now().Unix())
 
-	loggo.Info("New Stratum ok")
+	loggo.Info("Stratum New ok")
 
 	return &stratum, nil
 }
@@ -249,6 +251,8 @@ func (s *Stratum) Reconnect() error {
 
 // Listen is the listener for the incoming messages from the stratum pool.
 func (s *Stratum) Listen() {
+	defer common.CrashLog()
+
 	loggo.Info("Stratum Starting Listener")
 
 	for {
