@@ -180,6 +180,8 @@ func StratumConn(pool, user, pass string) (*Stratum, error) {
 	var conn net.Conn
 	var err error
 
+	loggo.Info("Stratum pool start connect %v->%v", conn.LocalAddr(), conn.RemoteAddr())
+
 	conn, err = net.Dial("tcp", pool)
 	if err != nil {
 		return nil, err
@@ -393,6 +395,14 @@ func (s *Stratum) handleNotifyRes(resp interface{}) {
 	s.PoolWork.Ntime = nResp.Ntime
 	s.PoolWork.NtimeDelta = parsedNtime - time.Now().Unix()
 	s.PoolWork.Clean = nResp.CleanJobs
+
+	err = s.PrepWork()
+	if err != nil {
+		loggo.Error("Stratum handleNotifyRes PrepWork fail %v", err)
+		height = 0
+		return
+	}
+
 	s.PoolWork.NewWork = true
 
 	loggo.Info("Stratum recv new job %v %v %v", s.PoolWork.JobID, s.PoolWork.Hash, s.PoolWork.Height)

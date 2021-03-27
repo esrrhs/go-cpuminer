@@ -36,6 +36,13 @@ func (m *Miner) Stop() {
 
 func (m *Miner) Run() {
 	for !m.exit {
+		if m.pool.PoolWork.NewWork {
+			m.pool.PoolWork.NewWork = false
+			w := m.pool.PoolWork.Work
+			if w != nil {
+
+			}
+		}
 		time.Sleep(time.Second)
 	}
 }
