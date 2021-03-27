@@ -12,12 +12,20 @@ type Miner struct {
 
 	started uint32
 	exit    bool
+
+	pool *Stratum
 }
 
-func NewMiner(string, string, string, string) (*Miner, error) {
+func NewMiner(server, usrname, password, name string) (*Miner, error) {
 	m := &Miner{}
 
 	m.started = uint32(time.Now().Unix())
+
+	s, err := StratumConn(server, usrname, password)
+	if err != nil {
+		return nil, err
+	}
+	m.pool = s
 
 	return m, nil
 }
