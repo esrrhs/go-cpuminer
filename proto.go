@@ -1,5 +1,7 @@
 package main
 
+import "encoding/json"
+
 type JSONRpcReq struct {
 	Id      int         `json:"id"`
 	Method  string      `json:"method"`
@@ -17,10 +19,12 @@ type LoginParam struct {
 ///////////////////////////////////////////////////
 
 type JSONRpcRsp struct {
-	Id      interface{} `json:"id"`
-	Version string      `json:"jsonrpc"`
-	Result  *JobReply   `json:"result"`
-	Error   *ErrorReply `json:"error"`
+	Id      int              `json:"id"`
+	Version string           `json:"jsonrpc"`
+	Result  *JobReply        `json:"result"`
+	Error   *ErrorReply      `json:"error"`
+	Method  string           `json:"method"`
+	Params  *json.RawMessage `json:"params"`
 }
 
 type ErrorReply struct {

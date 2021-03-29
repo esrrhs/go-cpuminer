@@ -106,25 +106,66 @@ func (s *Stratum) listen() {
 }
 
 func (s *Stratum) handleRsp(rsp JSONRpcRsp) bool {
+	loggo.Debug("Stratum handleRsp %v", rsp.Id)
 	err := rsp.Error
 	if err != nil {
 		loggo.Error("Stratum handleRsp error %v", err)
 		return false
 	}
 	id := rsp.Id
-	if id != nil {
-		i, ok := id.(int)
-		if ok {
-			return s.handleResponse(i, rsp)
-		}
+	if id != 0 {
+		return s.handleResponse(id, rsp)
 	}
+
+	return s.handleNotify(rsp)
+}
+
+func (s *Stratum) handleNotify(rsp JSONRpcRsp) bool {
+	loggo.Debug("Stratum handleNotify %v", rsp.Method)
+
+	if rsp.Method == "" {
+		loggo.Error("Stratum handleNotify no method")
+		return false
+	}
+
+	m := rsp.Method
+	if m == "job" {
+		return s.handleNotifyJob(rsp)
+	}
+
 	return true
 }
 
+func (s *Stratum) handleNotifyJob(rsp JSONRpcRsp) bool {
+	loggo.Debug("Stratum handleNotifyJob %v", rsp.Method)
+
+	if rsp.Params == nil {
+		loggo.Error("Stratum handleNotifyJob no Params")
+		return false
+	}
+
+	var job JobReplyData
+	err := json.Unmarshal(*rsp.Params, &job)
+	if err != nil {
+		loggo.Error("Stratum handleNotifyJob Unmarshal fail %v", err)
+		return false
+	}
+
+	return s.parseJob(&job)
+}
+
 func (s *Stratum) handleResponse(id int, rsp JSONRpcRsp) bool {
+	loggo.Debug("Stratum handleResponse %v", id)
 	if id == 1 {
 		return s.handleLogin(rsp)
 	}
+
+	return s.handleSubmitResponse(id, rsp)
+}
+
+func (s *Stratum) handleSubmitResponse(id int, rsp JSONRpcRsp) bool {
+	loggo.Info("Stratum handleSubmitResponse %v", id)
+	// TODO
 	return true
 }
 
@@ -135,7 +176,7 @@ func (s *Stratum) handleLogin(rsp JSONRpcRsp) bool {
 		return false
 	}
 
-	loggo.Info("Stratum handleLogin login rsp")
+	loggo.Debug("Stratum handleLogin rsp")
 
 	if result.Id == "" {
 		loggo.Error("Stratum handleLogin no Id")
@@ -153,6 +194,8 @@ func (s *Stratum) handleLogin(rsp JSONRpcRsp) bool {
 		loggo.Error("Stratum parseJob fail")
 		return false
 	}
+
+	loggo.Info("Stratum handleLogin ok")
 
 	return true
 }
@@ -192,6 +235,9 @@ func (s *Stratum) parseJob(job *JobReplyData) bool {
 	}
 
 	s.job = j
+
+	loggo.Info("Stratum parseJob ok algo=%v height=%v target=%v", j.algorithm.name(), j.height, j.target)
+
 	return true
 }
 
