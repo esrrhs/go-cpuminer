@@ -207,6 +207,14 @@ func (s *Stratum) parseJob(job *JobReplyData) bool {
 		clientId:  s.rpcid,
 	}
 
+	if job.Algo != "" {
+		j.algorithm = NewAlgorithm(job.Algo)
+		if j.algorithm == nil {
+			loggo.Error("Stratum parseJob fail Algorithm %v", job.Algo)
+			return false
+		}
+	}
+
 	if !j.setBlob(job.Blob) {
 		loggo.Error("Stratum parseJob fail Blob %v", job.Blob)
 		return false
@@ -215,14 +223,6 @@ func (s *Stratum) parseJob(job *JobReplyData) bool {
 	if !j.setTarget(job.Target) {
 		loggo.Error("Stratum parseJob fail Target %v", job.Target)
 		return false
-	}
-
-	if job.Algo != "" {
-		j.algorithm = NewAlgorithm(job.Algo)
-		if j.algorithm == nil {
-			loggo.Error("Stratum parseJob fail Algorithm %v", job.Algo)
-			return false
-		}
 	}
 
 	j.height = job.Height
