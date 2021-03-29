@@ -6,3 +6,4 @@ pure golang cpu miner
 * https://github.com/decred/gominer
 * https://github.com/xmrig/xmrig
 * https://github.com/gurupras/go-cryptonight-miner
+* https://git.dero.io/DERO_Foundation/RandomX
