@@ -24,3 +24,7 @@ func NewAlgorithm(algo string) *Algorithm {
 func (a *Algorithm) family() int {
 	return UNKNOWN
 }
+
+func (a *Algorithm) name() string {
+	return ""
+}
