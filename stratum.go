@@ -236,7 +236,7 @@ func (s *Stratum) parseJob(job *JobReplyData) bool {
 
 	s.job = j
 
-	loggo.Info("Stratum parseJob ok algo=%v height=%v target=%v", j.algorithm.name(), j.height, j.target)
+	loggo.Info("Stratum parseJob ok algo=%v height=%v target=%v diff=%v", j.algorithm.name(), j.height, j.target, j.diff)
 
 	return true
 }
