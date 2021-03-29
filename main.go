@@ -18,6 +18,7 @@ func main() {
 
 	defer common.CrashLog()
 
+	algo := flag.String("algo", "", "algo name")
 	name := flag.String("name", "g", "worker name")
 	username := flag.String("user", "my", "username")
 	password := flag.String("pass", "x", "password")
@@ -78,7 +79,7 @@ func main() {
 
 	ms := make([]*Miner, *thread)
 	for i := 0; i < *thread; i++ {
-		m, err := NewMiner(*server, *username, *password, *name+strconv.Itoa(i))
+		m, err := NewMiner(*server, *algo, *username, *password, *name+strconv.Itoa(i))
 		if err != nil {
 			loggo.Error("Error initializing miner: %v", err)
 			return
