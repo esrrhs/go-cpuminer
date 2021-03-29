@@ -5,3 +5,4 @@ pure golang cpu miner
 * https://github.com/sammy007/monero-stratum
 * https://github.com/decred/gominer
 * https://github.com/xmrig/xmrig
+* https://github.com/gurupras/go-cryptonight-miner
