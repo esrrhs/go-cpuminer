@@ -1,27 +1,29 @@
 package main
 
 import (
+	"github.com/pkg/errors"
 	"time"
 )
 
 type Miner struct {
-	// The following variables must only be used atomically.
 	validShares   uint64
 	staleShares   uint64
 	invalidShares uint64
 
-	started uint32
-	exit    bool
+	exit bool
 
 	pool *Stratum
 }
 
-func NewMiner(server, usrname, password, name string) (*Miner, error) {
+func NewMiner(server, algo, usrname, password, name string) (*Miner, error) {
 	m := &Miner{}
 
-	m.started = uint32(time.Now().Unix())
+	a := NewAlgorithm(algo)
+	if a == nil {
+		return nil, errors.New("NewAlgorithm fail")
+	}
 
-	s, err := StratumConn(server, usrname, password)
+	s, err := NewStratum(server, a, usrname, password)
 	if err != nil {
 		return nil, err
 	}
