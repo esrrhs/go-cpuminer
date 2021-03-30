@@ -18,3 +18,4 @@ pure golang cpu miner
 * https://github.com/gurupras/go-cryptonight-miner
 * https://git.dero.io/DERO_Foundation/RandomX
 * https://haven.herominers.com/#how-to-mine-haven-xhv
+
