@@ -19,7 +19,7 @@ func NewMiner(server, algo, usrname, password, name string) (*Miner, error) {
 	m := &Miner{}
 
 	a := NewAlgorithm(algo)
-	if a == nil {
+	if a.id == INVALID {
 		return nil, errors.New("NewAlgorithm fail")
 	}
 
