@@ -17,6 +17,7 @@ pure golang cpu miner
 * https://github.com/decred/gominer
 * https://github.com/xmrig/xmrig
 * https://github.com/gurupras/go-cryptonight-miner
+* https://github.com/gurupras/go-stratum-client
 * https://git.dero.io/DERO_Foundation/RandomX
 * https://haven.herominers.com/#how-to-mine-haven-xhv
 * https://github.com/tevador/RandomX
