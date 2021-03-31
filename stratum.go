@@ -207,6 +207,12 @@ func (s *Stratum) parseJob(job *JobReplyData) bool {
 		clientId:  s.rpcid,
 	}
 
+	if job.JobId == "" {
+		loggo.Error("Stratum parseJob no JobId")
+		return false
+	}
+	j.id = job.JobId
+
 	if job.Algo != "" {
 		j.algorithm = NewAlgorithm(job.Algo)
 		if j.algorithm == nil {
