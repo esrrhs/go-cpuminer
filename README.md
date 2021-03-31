@@ -20,4 +20,4 @@ pure golang cpu miner
 * https://haven.herominers.com/#how-to-mine-haven-xhv
 * https://github.com/tevador/RandomX
 * https://medium.com/novamining/in-depth-analysis-on-stratum-protocol-and-its-known-vulnerabilities-3ef139495608
-* 
+
