@@ -24,3 +24,4 @@ pure golang cpu miner
 * https://medium.com/novamining/in-depth-analysis-on-stratum-protocol-and-its-known-vulnerabilities-3ef139495608
 * https://zhuanlan.zhihu.com/p/34441197
 * https://github.com/Equim-chan/cryptonight
+* https://www.cs.cmu.edu/~dga/crypto/xmr/cryptonight.png
