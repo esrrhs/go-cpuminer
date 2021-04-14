@@ -219,6 +219,11 @@ func (s *Stratum) parseJob(job *JobReplyData) bool {
 			loggo.Error("Stratum parseJob fail Algorithm %v", job.Algo)
 			return false
 		}
+	} else {
+		if j.algorithm == nil {
+			loggo.Error("Stratum no default Algorithm")
+			return false
+		}
 	}
 
 	if !j.setBlob(job.Blob) {

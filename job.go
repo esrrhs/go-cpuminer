@@ -23,7 +23,6 @@ type Job struct {
 	height     uint64
 	target     uint64
 	blob       [kMaxBlobSize]byte
-	index      int
 }
 
 func (j *Job) setBlob(blob string) bool {
@@ -109,4 +108,14 @@ func (j *Job) nonceSize() int {
 
 func (j *Job) nonce() uint32 {
 	return binary.LittleEndian.Uint32(j.blob[j.nonceOffset():])
+}
+
+func (j *Job) nonceMask() uint64 {
+	if j.nicehash {
+		return 0xFFFFFF
+	}
+	if j.nonceSize() == 8 {
+		return -1 >> (len(j.extraNonce) * 4)
+	}
+	return 0xFFFFFFFF
 }

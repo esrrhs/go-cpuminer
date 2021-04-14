@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/esrrhs/go-engine/src/common"
+	"github.com/esrrhs/go-engine/src/crypto"
 	"github.com/esrrhs/go-engine/src/loggo"
 	"net/http"
 	_ "net/http/pprof"
@@ -10,7 +11,6 @@ import (
 	"os/signal"
 	"runtime/pprof"
 	"strconv"
-	"sync/atomic"
 	"time"
 )
 
@@ -19,7 +19,6 @@ func main() {
 	defer common.CrashLog()
 
 	algo := flag.String("algo", "", "algo name")
-	name := flag.String("name", "g", "worker name")
 	username := flag.String("user", "my", "username")
 	password := flag.String("pass", "x", "password")
 	server := flag.String("server", "pool.hashvault.pro:80", "pool server addr")
@@ -46,6 +45,23 @@ func main() {
 		NoPrint:   *noprint > 0,
 	})
 	loggo.Info("start...")
+
+	var al *Algorithm
+	if *algo != "" {
+		al = NewAlgorithm(*algo)
+		if al.id == INVALID {
+			loggo.Error("Unable to create algo %v", *algo)
+			return
+		}
+		if al.supportAlgoName() == "" {
+			loggo.Error("Unable to support algo %v", *algo)
+			return
+		}
+		if !crypto.TestSum(al.supportAlgoName()) {
+			loggo.Error("test algo %v fail", al.supportAlgoName())
+			return
+		}
+	}
 
 	if *profile > 0 {
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(*profile), nil)
@@ -77,14 +93,10 @@ func main() {
 		}()
 	}
 
-	ms := make([]*Miner, *thread)
-	for i := 0; i < *thread; i++ {
-		m, err := NewMiner(*server, *algo, *username, *password, *name+strconv.Itoa(i))
-		if err != nil {
-			loggo.Error("Error initializing miner: %v", err)
-			return
-		}
-		ms[i] = m
+	m, err := NewMiner(*server, al, *username, *password, *thread)
+	if err != nil {
+		loggo.Error("Error initializing miner: %v", err)
+		return
 	}
 
 	c := make(chan os.Signal, 1)
@@ -93,24 +105,10 @@ func main() {
 		defer common.CrashLog()
 		<-c
 		loggo.Warn("Got Control+C, exiting...")
-		for i := 0; i < *thread; i++ {
-			ms[i].Stop()
-		}
+		m.Stop()
 	}()
 
-	num := int32(*thread)
-	for i := 0; i < *thread; i++ {
-		index := i
-		go func() {
-			defer common.CrashLog()
-			defer atomic.AddInt32(&num, -1)
-			ms[index].Run()
-		}()
-	}
-
-	for num > 0 {
-		time.Sleep(time.Second)
-	}
+	m.Run()
 
 	loggo.Info("exit...")
 }

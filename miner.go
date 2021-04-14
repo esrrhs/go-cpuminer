@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/pkg/errors"
+	"github.com/esrrhs/go-engine/src/common"
+	"github.com/esrrhs/go-engine/src/loggo"
 	"time"
 )
 
@@ -12,22 +13,31 @@ type Miner struct {
 
 	exit bool
 
-	pool *Stratum
+	pool    *Stratum
+	workers []Worker
 }
 
-func NewMiner(server, algo, usrname, password, name string) (*Miner, error) {
+func NewMiner(server string, algo *Algorithm, usrname string, password string, thread int) (*Miner, error) {
 	m := &Miner{}
 
-	a := NewAlgorithm(algo)
-	if a.id == INVALID {
-		return nil, errors.New("NewAlgorithm fail")
-	}
-
-	s, err := NewStratum(server, a, usrname, password)
+	p, err := NewStratum(server, algo, usrname, password)
 	if err != nil {
 		return nil, err
 	}
-	m.pool = s
+	m.pool = p
+
+	if thread <= 0 {
+		thread = 1
+	}
+	m.workers = make([]Worker, thread)
+	for _, w := range m.workers {
+		worker := w
+		worker.result = make(chan *JobResult, 1024)
+		go func() {
+			defer common.CrashLog()
+			worker.start()
+		}()
+	}
 
 	return m, nil
 }
@@ -38,6 +48,21 @@ func (m *Miner) Stop() {
 
 func (m *Miner) Run() {
 	for !m.exit {
-		time.Sleep(time.Second)
+		needSleep := true
+		if m.pool.job != nil {
+			j := m.pool.job
+			m.pool.job = nil
+			seq := addNonceSequence()
+			non := &Nonce{}
+			for _, w := range m.workers {
+				w.setJob(j, seq, non)
+			}
+			loggo.Info("Miner setJob ok id=%v algo=%v height=%v target=%v diff=%v", j.id, j.algorithm.name(), j.height, j.target, j.diff)
+			needSleep = false
+		}
+
+		if needSleep {
+			time.Sleep(time.Millisecond * 5)
+		}
 	}
 }
