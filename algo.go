@@ -205,3 +205,47 @@ func (a *Algorithm) shortName() string {
 	}
 	return "invalid"
 }
+
+func (a *Algorithm) supportAlgoName() string {
+	switch a.id {
+	case CN_0:
+		return "cn/0"
+	case CN_1:
+		return "cn/1"
+	case CN_2:
+		return "cn/2"
+	case CN_R:
+		return "cn/r"
+	case CN_FAST:
+		return "cn/fast"
+	case CN_HALF:
+		return "cn/half"
+	case CN_XAO:
+		return "cn/xao"
+	case CN_RTO:
+		return "cn/rto"
+	case CN_RWZ:
+		return "cn/rwz"
+	case CN_ZLS:
+		return "cn/zls"
+	case CN_DOUBLE:
+		return "cn/double"
+	case CN_LITE_0:
+		return "cn-lite/0"
+	case CN_LITE_1:
+		return "cn-lite/1"
+	case CN_HEAVY_0:
+		return "cn-heavy/0"
+	case CN_HEAVY_TUBE:
+		return "cn-heavy/tube"
+	case CN_HEAVY_XHV:
+		return "cn-heavy/xhv"
+	case CN_PICO_0:
+		return "cn-pico"
+	case CN_PICO_TLO:
+		return "cn-pico/tlo"
+	default:
+		break
+	}
+	return ""
+}
