@@ -2,22 +2,26 @@ package main
 
 import (
 	"bufio"
+	"encoding/binary"
 	"encoding/json"
 	"github.com/esrrhs/go-engine/src/common"
 	"github.com/esrrhs/go-engine/src/loggo"
 	"net"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 )
 
 type Stratum struct {
-	pool  string
-	alg   *Algorithm
-	user  string
-	pass  string
-	agent string
-	rigid string
-	rpcid string
+	pool     string
+	alg      *Algorithm
+	user     string
+	pass     string
+	agent    string
+	rigid    string
+	rpcid    string
+	sequence int
 
 	ext_algo      bool
 	ext_nicehash  bool
@@ -26,15 +30,21 @@ type Stratum struct {
 
 	conn   net.Conn
 	reader *bufio.Reader
-	job    *Job
+	jobs   chan *Job
+	lock   sync.Locker
+
+	submits sync.Map
+	stat    *Stat
 }
 
-func NewStratum(pool string, alg *Algorithm, user string, pass string) (*Stratum, error) {
+func NewStratum(pool string, alg *Algorithm, user string, pass string, jobs chan *Job, stat *Stat) (*Stratum, error) {
 	var s Stratum
 	s.user = user
 	s.pass = pass
 	s.alg = alg
 	s.pool = pool
+	s.jobs = jobs
+	s.stat = stat
 
 	err := s.Reconnect()
 	if err != nil {
@@ -109,6 +119,7 @@ func (s *Stratum) handleRsp(rsp JSONRpcRsp) bool {
 	loggo.Debug("Stratum handleRsp %v", rsp.Id)
 	err := rsp.Error
 	if err != nil {
+		s.handleSubmitResponse(rsp.Id, err.Message)
 		loggo.Error("Stratum handleRsp error %v", err)
 		return false
 	}
@@ -160,12 +171,26 @@ func (s *Stratum) handleResponse(id int, rsp JSONRpcRsp) bool {
 		return s.handleLogin(rsp)
 	}
 
-	return s.handleSubmitResponse(id, rsp)
+	return s.handleSubmitResponse(id, "")
 }
 
-func (s *Stratum) handleSubmitResponse(id int, rsp JSONRpcRsp) bool {
-	loggo.Info("Stratum handleSubmitResponse %v", id)
-	// TODO
+func (s *Stratum) handleSubmitResponse(id int, error string) bool {
+	loggo.Info("Stratum handleSubmitResponse %v %v", id, error)
+
+	v, ok := s.submits.Load(id)
+	if ok {
+		s.submits.Delete(id)
+		result := v.(*JobResult)
+		elapse := time.Now().Sub(result.submit)
+		if error != "" {
+			atomic.AddInt64(&s.stat.submitJobFail, 1)
+			loggo.Error("Stratum Submit Job Fail %v %v %v", error, result.job.id, elapse)
+		} else {
+			atomic.AddInt64(&s.stat.submitJobOK, 1)
+			loggo.Error("Stratum Submit Job OK %v %v", result.job.id, elapse)
+		}
+	}
+
 	return true
 }
 
@@ -245,7 +270,7 @@ func (s *Stratum) parseJob(job *JobReplyData) bool {
 		}
 	}
 
-	s.job = j
+	s.jobs <- j
 
 	loggo.Info("Stratum parseJob ok id=%v algo=%v height=%v target=%v diff=%v", j.id, j.algorithm.name(), j.height, j.target, j.diff)
 
@@ -270,6 +295,8 @@ func (s *Stratum) parseExtensions(result *JobReply) bool {
 }
 
 func (s *Stratum) send(id int, method string, p interface{}) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
 	m, err := json.Marshal(p)
 	if err != nil {
@@ -302,6 +329,8 @@ func (s *Stratum) send(id int, method string, p interface{}) error {
 		return err
 	}
 
+	s.sequence++
+
 	return nil
 }
 
@@ -316,4 +345,57 @@ func (s *Stratum) login() error {
 	loggo.Info("Stratum start login...")
 
 	return s.send(1, "login", &msg)
+}
+
+func (s *Stratum) submit(result *JobResult) {
+
+	atomic.AddInt64(&s.stat.submitJob, 1)
+
+	var nonce_bytes [4]byte
+	binary.LittleEndian.PutUint32(nonce_bytes[:], result.nonce)
+	b, nonce_str := toHex(nonce_bytes[:])
+	if !b {
+		atomic.AddInt64(&s.stat.submitJobFail, 1)
+		loggo.Error("Stratum submit toHex nonce fail %v %v", result.nonce, nonce_str)
+		return
+	}
+
+	b, hash_str := toHex(result.hash[:])
+	if !b {
+		atomic.AddInt64(&s.stat.submitJobFail, 1)
+		loggo.Error("Stratum submit toHex hash fail %v %v", result.hash, hash_str)
+		return
+	}
+
+	algo := ""
+	if s.ext_algo && result.job.algorithm != nil {
+		algo = result.job.algorithm.shortName()
+	}
+
+	msg := SubmitParam{
+		Id:     s.rpcid,
+		JobId:  result.job.id,
+		Nonce:  nonce_str,
+		Result: hash_str,
+		Algo:   algo,
+	}
+
+	loggo.Info("Stratum submit JobId=%v Result=%v Nonce=%v", msg.JobId, msg.Result, msg.Nonce)
+
+	result.submit = time.Now()
+	s.submits.Store(s.sequence, result)
+
+	err := s.send(s.sequence, "submit", &msg)
+	if err != nil {
+		atomic.AddInt64(&s.stat.submitJobFail, 1)
+		loggo.Error("Stratum submit send fail %v", err)
+		return
+	}
+}
+
+func (s *Stratum) hb() {
+	msg := HBParam{
+		Id: s.rpcid,
+	}
+	s.send(s.sequence, "keepalived", &msg)
 }

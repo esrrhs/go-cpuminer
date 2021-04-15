@@ -28,6 +28,14 @@ func fromHex(s string) (bool, []byte) {
 	return true, data
 }
 
+func toHex(b []byte) (bool, string) {
+	d := hex.EncodeToString(b)
+	if len(d)/2 != len(b) {
+		return false, d
+	}
+	return true, d
+}
+
 func toDiff(target uint64) uint64 {
 	if target != 0 {
 		return 0xFFFFFFFFFFFFFFFF / target

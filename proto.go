@@ -16,6 +16,18 @@ type LoginParam struct {
 	Rigid string `json:"rigid"`
 }
 
+type SubmitParam struct {
+	Id     string `json:"id"`
+	JobId  string `json:"job_id"`
+	Nonce  string `json:"nonce"`
+	Result string `json:"result"`
+	Algo   string `json:"algo"`
+}
+
+type HBParam struct {
+	Id string `json:"id"`
+}
+
 ///////////////////////////////////////////////////
 
 type JSONRpcRsp struct {
