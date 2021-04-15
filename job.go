@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"math"
 )
 
 const (
@@ -115,7 +116,7 @@ func (j *Job) nonceMask() uint64 {
 		return 0xFFFFFF
 	}
 	if j.nonceSize() == 8 {
-		return -1 >> (len(j.extraNonce) * 4)
+		return math.MaxUint64 >> (len(j.extraNonce) * 4)
 	}
 	return 0xFFFFFFFF
 }
