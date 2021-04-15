@@ -5,6 +5,7 @@ import (
 	"github.com/esrrhs/go-engine/src/crypto"
 	"github.com/esrrhs/go-engine/src/loggo"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -14,9 +15,16 @@ const (
 
 type Worker struct {
 	wj     *WorkerJob
-	count  uint64
 	lock   sync.Locker
-	result chan<- *JobResult
+	result chan *JobResult
+	stat   *Stat
+}
+
+func NewWorker(result chan *JobResult, stat *Stat) *Worker {
+	w := &Worker{}
+	w.result = result
+	w.stat = stat
+	return w
 }
 
 func (w *Worker) start() {
@@ -42,14 +50,14 @@ func (w *Worker) start() {
 				w.submit(job, currentJobNonces, hash)
 			}
 
-			w.count++
+			atomic.AddInt64(&w.stat.hash, 1)
 		}
 
 		if w.wj.seq == gSequence {
 			w.lock.Lock()
 			if w.wj.seq == gSequence {
 				w.wj = nil
-				loggo.Debug("remove job %v", gSequence)
+				loggo.Debug("worker remove job %v", gSequence)
 			}
 			w.lock.Unlock()
 		}
@@ -65,13 +73,15 @@ func (w *Worker) nextRound() bool {
 }
 
 func (w *Worker) done(job *Job) {
-	loggo.Debug("job done %v", job.id)
+	loggo.Debug("worker job done %v", job.id)
 }
 
 func (w *Worker) submit(job *Job, nonces uint32, hash []byte) {
-	loggo.Debug("job submit %v %v", job.id, nonces)
-
-	jr := &JobResult{job, nonces, hash}
+	loggo.Debug("worker job submit %v %v", job.id, nonces)
+	jr := &JobResult{}
+	jr.job = job
+	jr.nonce = nonces
+	copy(jr.hash[:], hash)
 	w.result <- jr
 }
 
@@ -81,6 +91,6 @@ func (w *Worker) setJob(j *Job, sequence uint64, non *Nonce) {
 	wj.add(j, sequence, kReserveCount)
 	w.lock.Lock()
 	w.wj = wj
-	loggo.Debug("add done %v", sequence)
+	loggo.Debug("worker add done %v", sequence)
 	w.lock.Unlock()
 }
