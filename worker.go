@@ -15,7 +15,7 @@ const (
 
 type Worker struct {
 	wj     *WorkerJob
-	lock   sync.Locker
+	lock   sync.Mutex
 	result chan *JobResult
 	stat   *Stat
 }
@@ -50,7 +50,7 @@ func (w *Worker) start() {
 				w.submit(job, currentJobNonces, hash)
 			}
 
-			atomic.AddInt64(&w.stat.hash, 1)
+			atomic.AddUint32(&w.stat.hash, 1)
 		}
 
 		if w.wj.seq == gSequence {

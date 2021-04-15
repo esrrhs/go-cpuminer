@@ -31,7 +31,7 @@ type Stratum struct {
 	conn   net.Conn
 	reader *bufio.Reader
 	jobs   chan *Job
-	lock   sync.Locker
+	lock   sync.Mutex
 
 	submits sync.Map
 	stat    *Stat
@@ -45,6 +45,7 @@ func NewStratum(pool string, alg *Algorithm, user string, pass string, jobs chan
 	s.pool = pool
 	s.jobs = jobs
 	s.stat = stat
+	s.sequence = 1
 
 	err := s.Reconnect()
 	if err != nil {
@@ -175,7 +176,7 @@ func (s *Stratum) handleResponse(id int, rsp JSONRpcRsp) bool {
 }
 
 func (s *Stratum) handleSubmitResponse(id int, error string) bool {
-	loggo.Info("Stratum handleSubmitResponse %v %v", id, error)
+	loggo.Debug("Stratum handleSubmitResponse %v %v", id, error)
 
 	v, ok := s.submits.Load(id)
 	if ok {
@@ -183,10 +184,10 @@ func (s *Stratum) handleSubmitResponse(id int, error string) bool {
 		result := v.(*JobResult)
 		elapse := time.Now().Sub(result.submit)
 		if error != "" {
-			atomic.AddInt64(&s.stat.submitJobFail, 1)
+			atomic.AddUint32(&s.stat.submitJobFail, 1)
 			loggo.Error("Stratum Submit Job Fail %v %v %v", error, result.job.id, elapse)
 		} else {
-			atomic.AddInt64(&s.stat.submitJobOK, 1)
+			atomic.AddUint32(&s.stat.submitJobOK, 1)
 			loggo.Error("Stratum Submit Job OK %v %v", result.job.id, elapse)
 		}
 	}
@@ -271,6 +272,7 @@ func (s *Stratum) parseJob(job *JobReplyData) bool {
 	}
 
 	s.jobs <- j
+	atomic.AddUint32(&s.stat.job, 1)
 
 	loggo.Info("Stratum parseJob ok id=%v algo=%v height=%v target=%v diff=%v", j.id, j.algorithm.name(), j.height, j.target, j.diff)
 
@@ -349,20 +351,20 @@ func (s *Stratum) login() error {
 
 func (s *Stratum) submit(result *JobResult) {
 
-	atomic.AddInt64(&s.stat.submitJob, 1)
+	atomic.AddUint32(&s.stat.submitJob, 1)
 
 	var nonce_bytes [4]byte
 	binary.LittleEndian.PutUint32(nonce_bytes[:], result.nonce)
 	b, nonce_str := toHex(nonce_bytes[:])
 	if !b {
-		atomic.AddInt64(&s.stat.submitJobFail, 1)
+		atomic.AddUint32(&s.stat.submitJobFail, 1)
 		loggo.Error("Stratum submit toHex nonce fail %v %v", result.nonce, nonce_str)
 		return
 	}
 
 	b, hash_str := toHex(result.hash[:])
 	if !b {
-		atomic.AddInt64(&s.stat.submitJobFail, 1)
+		atomic.AddUint32(&s.stat.submitJobFail, 1)
 		loggo.Error("Stratum submit toHex hash fail %v %v", result.hash, hash_str)
 		return
 	}
@@ -387,7 +389,7 @@ func (s *Stratum) submit(result *JobResult) {
 
 	err := s.send(s.sequence, "submit", &msg)
 	if err != nil {
-		atomic.AddInt64(&s.stat.submitJobFail, 1)
+		atomic.AddUint32(&s.stat.submitJobFail, 1)
 		loggo.Error("Stratum submit send fail %v", err)
 		return
 	}
