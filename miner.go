@@ -68,6 +68,9 @@ func (m *Miner) Run() {
 	for !m.exit {
 		time.Sleep(time.Second)
 		m.pool.hb()
+		loggo.Info("Hash=%v, Job=%v, JobSubmit=%v, JobAccept=%v, JobFail=%v", m.stat.hash, m.stat.job,
+			m.stat.submitJob, m.stat.submitJobOK, m.stat.submitJobFail)
+		m.stat.clear()
 	}
 }
 
