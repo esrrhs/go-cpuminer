@@ -28,6 +28,9 @@ func NewWorker(result chan *JobResult, stat *Stat) *Worker {
 }
 
 func (w *Worker) start() {
+
+	cy := crypto.NewCrypto("")
+
 	for {
 		if w.wj == nil {
 			time.Sleep(time.Millisecond * 5)
@@ -39,7 +42,7 @@ func (w *Worker) start() {
 			currentJobNonces := w.wj.nonce()
 
 			algo := job.algorithm.supportAlgoName()
-			hash := crypto.Sum(w.wj.blob()[0:job.size], algo, job.height)
+			hash := cy.Sum(w.wj.blob()[0:job.size], algo, job.height)
 
 			if !w.nextRound() {
 				break
