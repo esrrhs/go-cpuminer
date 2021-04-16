@@ -30,6 +30,7 @@ func main() {
 	profile := flag.Int("profile", 0, "open profile")
 	cpuprofile := flag.String("cpuprofile", "", "open cpuprofile")
 	memprofile := flag.String("memprofile", "", "open memprofile")
+	bench := flag.String("bench", "", "benchmark algo")
 
 	flag.Parse()
 
@@ -45,23 +46,6 @@ func main() {
 		NoPrint:   *noprint > 0,
 	})
 	loggo.Info("start...")
-
-	var al *Algorithm
-	if *algo != "" {
-		al = NewAlgorithm(*algo)
-		if al.id == INVALID {
-			loggo.Error("Unable to create algo %v", *algo)
-			return
-		}
-		if al.supportAlgoName() == "" {
-			loggo.Error("Unable to support algo %v", *algo)
-			return
-		}
-		if !crypto.TestSum(al.supportAlgoName()) {
-			loggo.Error("test algo %v fail", al.supportAlgoName())
-			return
-		}
-	}
 
 	if *profile > 0 {
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(*profile), nil)
@@ -93,22 +77,59 @@ func main() {
 		}()
 	}
 
-	m, err := NewMiner(*server, al, *username, *password, *thread)
-	if err != nil {
-		loggo.Error("Error initializing miner: %v", err)
-		return
+	if *bench != "" {
+		b, err := NewBenchmark(*bench)
+		if err != nil {
+			loggo.Error("Error initializing Benchmark: %v", err)
+			return
+		}
+
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt)
+		go func() {
+			defer common.CrashLog()
+			<-c
+			loggo.Warn("Got Control+C, exiting...")
+			b.Stop()
+		}()
+
+		b.Run()
+
+	} else {
+		var al *Algorithm
+		if *algo != "" {
+			al = NewAlgorithm(*algo)
+			if al.id == INVALID {
+				loggo.Error("Unable to create algo %v", *algo)
+				return
+			}
+			if al.supportAlgoName() == "" {
+				loggo.Error("Unable to support algo %v", *algo)
+				return
+			}
+			if !crypto.TestSum(al.supportAlgoName()) {
+				loggo.Error("test algo %v fail", al.supportAlgoName())
+				return
+			}
+		}
+
+		m, err := NewMiner(*server, al, *username, *password, *thread)
+		if err != nil {
+			loggo.Error("Error initializing miner: %v", err)
+			return
+		}
+
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt)
+		go func() {
+			defer common.CrashLog()
+			<-c
+			loggo.Warn("Got Control+C, exiting...")
+			m.Stop()
+		}()
+
+		m.Run()
 	}
-
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		defer common.CrashLog()
-		<-c
-		loggo.Warn("Got Control+C, exiting...")
-		m.Stop()
-	}()
-
-	m.Run()
 
 	loggo.Info("exit...")
 }
