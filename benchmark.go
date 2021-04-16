@@ -49,12 +49,14 @@ func (b *Benchmark) Run() {
 		input[i] = byte(i)
 	}
 
+	cy := crypto.NewCrypto("")
+
 	for !b.exit {
 		for _, al := range b.algos {
 			start := time.Now()
 			n := 0
 			for i := 0; i < 1024 && !b.exit; i++ {
-				crypto.Sum(input[:], al.supportAlgoName(), 0)
+				cy.Sum(input[:], al.supportAlgoName(), 0)
 				n++
 				if time.Now().Sub(start) > time.Second*5 {
 					break
