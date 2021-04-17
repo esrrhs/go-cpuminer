@@ -46,10 +46,10 @@ func (t *Tester) Stop() {
 func (t Tester) Run() {
 
 	job := &Job{}
+	job.algorithm = t.algo
 	job.setBlob(TEST_BLOB)
 	job.setTarget(TEST_TARGET)
 	job.height = TEST_HEIGHT
-	job.algorithm = t.algo
 
 	non := &Nonce{}
 
