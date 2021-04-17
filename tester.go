@@ -90,7 +90,7 @@ func (t Tester) Run() {
 			start = time.Now()
 			speed := float32(n) / float32(elapse/time.Second)
 			n = 0
-			loggo.Info("Tester Algo=%v Nonces=%v HashSpeed=%v/s Done=%v/s", t.algo.supportAlgoName(), currentJobNonces,
+			loggo.Info("Tester Algo=%v Nonces=%v HashSpeed=%v/s Done=%v", t.algo.supportAlgoName(), currentJobNonces,
 				speed, done)
 		}
 	}
