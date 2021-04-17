@@ -113,7 +113,7 @@ func main() {
 
 		t.Run()
 
-	} else if *ty != "miner" {
+	} else if *ty == "miner" {
 		var al *Algorithm
 		if *algo != "" {
 			al = NewAlgorithm(*algo)
