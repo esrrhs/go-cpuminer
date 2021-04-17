@@ -11,6 +11,14 @@ pure golang cpu miner
 ```
 ./go-cpuminer -server hk.haven.herominers.com:10450 -user hvxxwtgSqXaH9AZYYed9NbijK8hydEVtpb2k8SLv39ZrQxHacwP8QeeYriNunavkRf5fYbdf6BPj6g7yGmh2kS2i4toHRp4pdG -pass x -algo cn-heavy/xhv
 ```
+* haven性能测试
+```
+./go-cpuminer -type benchmark -algo cn-heavy/xhv
+```
+* haven挖矿测试
+```
+./go-cpuminer -type test -algo cn-heavy/xhv
+```
 
 # 参考
 * https://github.com/sammy007/monero-stratum
