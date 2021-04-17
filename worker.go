@@ -39,7 +39,7 @@ func (w *Worker) start() {
 
 		for w.wj.seq == gSequence {
 			job := w.wj.currentJob()
-			currentJobNonces := w.wj.nonce()
+			currentJobNonces := w.wj.nonce0()
 
 			algo := job.algorithm.supportAlgoName()
 			hash := cy.Sum(w.wj.blob()[0:job.size], algo, job.height)
