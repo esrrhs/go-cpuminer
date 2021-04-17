@@ -65,12 +65,17 @@ func (m *Miner) Stop() {
 }
 
 func (m *Miner) Run() {
+	start := time.Now()
 	for !m.exit {
-		time.Sleep(time.Second * 5)
-		m.pool.hb()
-		loggo.Info("Hash=%v, Job=%v, JobSubmit=%v, JobAccept=%v, JobFail=%v", m.stat.hash, m.stat.job,
-			m.stat.submitJob, m.stat.submitJobOK, m.stat.submitJobFail)
-		m.stat.clear()
+		if time.Now().Sub(start) > time.Second*5 {
+			elapse := time.Now().Sub(start)
+			start = time.Now()
+			speed := float32(m.stat.hash) / float32(elapse/time.Second)
+			m.pool.hb()
+			loggo.Info("HashSpeed=%v/s, Job=%v, JobSubmit=%v, JobAccept=%v, JobFail=%v", speed, m.stat.job,
+				m.stat.submitJob, m.stat.submitJobOK, m.stat.submitJobFail)
+			m.stat.clear()
+		}
 	}
 }
 
