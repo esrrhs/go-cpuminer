@@ -188,7 +188,7 @@ func (s *Stratum) handleSubmitResponse(id int, error string) bool {
 			loggo.Error("Stratum Submit Job Fail %v %v %v", error, result.job.id, elapse)
 		} else {
 			atomic.AddUint32(&s.stat.submitJobOK, 1)
-			loggo.Error("Stratum Submit Job OK %v %v", result.job.id, elapse)
+			loggo.Warn("Stratum Submit Job OK %v %v", result.job.id, elapse)
 		}
 	}
 
