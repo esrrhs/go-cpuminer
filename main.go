@@ -77,7 +77,7 @@ func main() {
 		}()
 	}
 
-	if *ty != "benchmark" {
+	if *ty == "benchmark" {
 		b, err := NewBenchmark(*algo)
 		if err != nil {
 			loggo.Error("Error initializing Benchmark: %v", err)
@@ -95,7 +95,7 @@ func main() {
 
 		b.Run()
 
-	} else if *ty != "test" {
+	} else if *ty == "test" {
 		t, err := NewTester(*algo)
 		if err != nil {
 			loggo.Error("Error initializing Benchmark: %v", err)
