@@ -76,8 +76,9 @@ func (t Tester) Run() {
 
 		value := binary.LittleEndian.Uint64(hash[24:])
 		if value < job.target {
-			loggo.Warn("Tester done hash blob=%v nonce=%v hash=%v value=%v target=%v",
-				hex.EncodeToString(wj.blob()[0:job.size]), currentJobNonces, hex.EncodeToString(hash), value, job.target)
+			loggo.Warn("Tester find hash Algo=%v Nonce=%v Blob=%v Hash=%v Value=%v Target=%v",
+				t.algo.supportAlgoName(), currentJobNonces, hex.EncodeToString(wj.blob()[0:job.size]),
+				hex.EncodeToString(hash), value, job.target)
 			done++
 		}
 
@@ -85,11 +86,12 @@ func (t Tester) Run() {
 		n++
 
 		elapse := time.Now().Sub(start)
-		if elapse > time.Second*10 {
+		if elapse > time.Minute {
 			start = time.Now()
 			speed := float32(n) / float32(elapse/time.Second)
 			n = 0
-			loggo.Info("Tester Algo=%v HashSpeed=%v/s Done=%v/s", t.algo.supportAlgoName(), speed, done)
+			loggo.Info("Tester Algo=%v Nonces=%v HashSpeed=%v/s Done=%v/s", t.algo.supportAlgoName(), currentJobNonces,
+				speed, done)
 		}
 	}
 }
