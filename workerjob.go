@@ -23,12 +23,20 @@ func (wj *WorkerJob) sequence() uint64 {
 	return wj.seq
 }
 
-func (wj *WorkerJob) nonce() uint32 {
+func (wj *WorkerJob) nonce0() uint32 {
 	return binary.LittleEndian.Uint32(wj.blob()[wj.nonceOffset():])
 }
 
-func (wj *WorkerJob) setNonce(n uint32) {
+func (wj *WorkerJob) nonce1() uint32 {
+	return binary.LittleEndian.Uint32(wj.blob()[wj.nonceOffset()+4:])
+}
+
+func (wj *WorkerJob) setNonce0(n uint32) {
 	binary.LittleEndian.PutUint32(wj.blob()[wj.nonceOffset():], n)
+}
+
+func (wj *WorkerJob) setNonce1(n uint32) {
+	binary.LittleEndian.PutUint32(wj.blob()[wj.nonceOffset()+4:], n)
 }
 
 func (wj *WorkerJob) nonceOffset() int {
@@ -50,21 +58,23 @@ func (wj *WorkerJob) add(job *Job, sequence uint64, reserveCount uint32) {
 	wj.rounds = 0
 	wj.nonce_mask = job.nonceMask()
 	copy(wj.blobs[:size], job.blob[:size])
-	_, n := wj.non.next(wj.nonce(), reserveCount, wj.nonceMask())
-	wj.setNonce(n)
+	_, n0, n1 := wj.non.next(wj.nonce0(), wj.nonce1(), reserveCount, wj.nonceMask())
+	wj.setNonce0(n0)
+	wj.setNonce1(n1)
 }
 
 func (wj *WorkerJob) nextRound(rounds uint32, roundSize uint32) bool {
 	wj.rounds++
 	if (wj.rounds & (rounds - 1)) == 0 {
-		b, n := wj.non.next(wj.nonce(), rounds*roundSize, wj.nonceMask())
+		b, n0, n1 := wj.non.next(wj.nonce0(), wj.nonce1(), rounds*roundSize, wj.nonceMask())
 		if !b {
 			return false
 		}
-		wj.setNonce(n)
+		wj.setNonce0(n0)
+		wj.setNonce1(n1)
 	} else {
-		n := wj.nonce() + roundSize
-		wj.setNonce(n)
+		n := wj.nonce0() + roundSize
+		wj.setNonce0(n)
 	}
 	return true
 }
