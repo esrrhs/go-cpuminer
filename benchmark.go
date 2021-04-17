@@ -25,13 +25,13 @@ func NewBenchmark(algo string) (*Benchmark, error) {
 	for _, alname := range algos {
 		al := NewAlgorithm(alname)
 		if al.id == INVALID {
-			return nil, errors.New("create algo fail " + alname)
+			return nil, errors.New("Benchmark create algo fail " + alname)
 		}
 		if al.supportAlgoName() == "" {
-			return nil, errors.New("support algo fail " + alname)
+			return nil, errors.New("Benchmark support algo fail " + alname)
 		}
 		if !crypto.TestSum(al.supportAlgoName()) {
-			return nil, errors.New("test algo fail " + al.supportAlgoName())
+			return nil, errors.New("Benchmark test algo fail " + al.supportAlgoName())
 		}
 		b.algos = append(b.algos, al)
 	}

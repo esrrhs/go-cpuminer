@@ -18,6 +18,7 @@ func main() {
 
 	defer common.CrashLog()
 
+	ty := flag.String("type", "miner", "miner/benchmark/test")
 	algo := flag.String("algo", "", "algo name")
 	username := flag.String("user", "my", "username")
 	password := flag.String("pass", "x", "password")
@@ -30,7 +31,6 @@ func main() {
 	profile := flag.Int("profile", 0, "open profile")
 	cpuprofile := flag.String("cpuprofile", "", "open cpuprofile")
 	memprofile := flag.String("memprofile", "", "open memprofile")
-	bench := flag.String("bench", "", "benchmark algo")
 
 	flag.Parse()
 
@@ -77,8 +77,8 @@ func main() {
 		}()
 	}
 
-	if *bench != "" {
-		b, err := NewBenchmark(*bench)
+	if *ty != "benchmark" {
+		b, err := NewBenchmark(*algo)
 		if err != nil {
 			loggo.Error("Error initializing Benchmark: %v", err)
 			return
@@ -95,7 +95,25 @@ func main() {
 
 		b.Run()
 
-	} else {
+	} else if *ty != "test" {
+		t, err := NewTester(*algo)
+		if err != nil {
+			loggo.Error("Error initializing Benchmark: %v", err)
+			return
+		}
+
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt)
+		go func() {
+			defer common.CrashLog()
+			<-c
+			loggo.Warn("Got Control+C, exiting...")
+			t.Stop()
+		}()
+
+		t.Run()
+
+	} else if *ty != "miner" {
 		var al *Algorithm
 		if *algo != "" {
 			al = NewAlgorithm(*algo)
