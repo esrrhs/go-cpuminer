@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/esrrhs/go-engine/src/crypto"
 	"github.com/esrrhs/go-engine/src/loggo"
+	"sync/atomic"
 	"time"
 )
 
@@ -83,7 +84,7 @@ func (t *Tester) Run() {
 			done++
 		}
 
-		n++
+		atomic.AddUint32(&n, 1)
 
 		elapse := time.Now().Sub(start)
 		if elapse > time.Minute {

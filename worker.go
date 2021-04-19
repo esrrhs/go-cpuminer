@@ -5,6 +5,7 @@ import (
 	"github.com/esrrhs/go-engine/src/crypto"
 	"github.com/esrrhs/go-engine/src/loggo"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -52,7 +53,7 @@ func (w *Worker) start() {
 				w.submit(job, currentJobNonces, hash)
 			}
 
-			w.stat.hash++
+			atomic.AddUint32(&w.stat.hash, 1)
 		}
 
 		if w.wj.seq == gSequence {
