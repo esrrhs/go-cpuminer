@@ -67,7 +67,7 @@ func (m *Miner) Stop() {
 func (m *Miner) Run() {
 	start := time.Now()
 	for !m.exit {
-		if time.Now().Sub(start) > time.Minute {
+		if time.Now().Sub(start) > time.Second*10 {
 			elapse := time.Now().Sub(start)
 			start = time.Now()
 			speed := float32(m.stat.hash) / float32(elapse/time.Second)
