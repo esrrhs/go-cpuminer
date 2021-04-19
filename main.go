@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"github.com/esrrhs/go-engine/src/common"
-	"github.com/esrrhs/go-engine/src/crypto"
 	"github.com/esrrhs/go-engine/src/loggo"
 	"net/http"
 	_ "net/http/pprof"
@@ -13,6 +12,11 @@ import (
 	"strconv"
 	"time"
 )
+
+type Runner interface {
+	Stop()
+	Run()
+}
 
 func main() {
 
@@ -77,77 +81,40 @@ func main() {
 		}()
 	}
 
+	var r Runner
 	if *ty == "benchmark" {
 		b, err := NewBenchmark(*algo)
 		if err != nil {
 			loggo.Error("Error initializing Benchmark: %v", err)
 			return
 		}
-
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt)
-		go func() {
-			defer common.CrashLog()
-			<-c
-			loggo.Warn("Got Control+C, exiting...")
-			b.Stop()
-		}()
-
-		b.Run()
-
+		r = b
 	} else if *ty == "test" {
 		t, err := NewTester(*algo)
 		if err != nil {
 			loggo.Error("Error initializing Benchmark: %v", err)
 			return
 		}
-
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt)
-		go func() {
-			defer common.CrashLog()
-			<-c
-			loggo.Warn("Got Control+C, exiting...")
-			t.Stop()
-		}()
-
-		t.Run()
-
+		r = t
 	} else if *ty == "miner" {
-		var al *Algorithm
-		if *algo != "" {
-			al = NewAlgorithm(*algo)
-			if al.id == INVALID {
-				loggo.Error("Unable to create algo %v", *algo)
-				return
-			}
-			if al.supportAlgoName() == "" {
-				loggo.Error("Unable to support algo %v", *algo)
-				return
-			}
-			if !crypto.TestSum(al.supportAlgoName()) {
-				loggo.Error("test algo %v fail", al.supportAlgoName())
-				return
-			}
-		}
-
-		m, err := NewMiner(*server, al, *username, *password, *thread)
+		m, err := NewMiner(*server, *algo, *username, *password, *thread)
 		if err != nil {
 			loggo.Error("Error initializing miner: %v", err)
 			return
 		}
-
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt)
-		go func() {
-			defer common.CrashLog()
-			<-c
-			loggo.Warn("Got Control+C, exiting...")
-			m.Stop()
-		}()
-
-		m.Run()
+		r = m
 	}
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		defer common.CrashLog()
+		<-c
+		loggo.Warn("Got Control+C, exiting...")
+		r.Stop()
+	}()
+
+	r.Run()
 
 	loggo.Info("exit...")
 }

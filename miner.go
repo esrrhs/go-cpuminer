@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/esrrhs/go-engine/src/common"
+	"github.com/esrrhs/go-engine/src/crypto"
 	"github.com/esrrhs/go-engine/src/loggo"
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -21,14 +23,28 @@ type Miner struct {
 	stat *Stat
 }
 
-func NewMiner(server string, algo *Algorithm, usrname string, password string, thread int) (*Miner, error) {
+func NewMiner(server string, algo string, usrname string, password string, thread int) (*Miner, error) {
 	m := &Miner{}
+
+	var al *Algorithm
+	if algo != "" {
+		al = NewAlgorithm(algo)
+		if al.id == INVALID {
+			return nil, errors.New("Unable to create algo " + algo)
+		}
+		if al.supportAlgoName() == "" {
+			return nil, errors.New("Unable to support algo " + algo)
+		}
+		if !crypto.TestSum(al.supportAlgoName()) {
+			return nil, errors.New("test algo fail " + algo)
+		}
+	}
 
 	m.jobs = make(chan *Job, 16)
 	m.result = make(chan *JobResult, 1024)
 	m.stat = &Stat{}
 
-	p, err := NewStratum(server, algo, usrname, password, m.jobs, m.stat)
+	p, err := NewStratum(server, al, usrname, password, m.jobs, m.stat)
 	if err != nil {
 		return nil, err
 	}
