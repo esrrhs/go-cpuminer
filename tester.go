@@ -44,7 +44,7 @@ func (t *Tester) Stop() {
 	t.exit = true
 }
 
-func (t Tester) Run() {
+func (t *Tester) Run() {
 
 	job := &Job{}
 	job.algorithm = t.algo
