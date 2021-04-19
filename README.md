@@ -1,4 +1,13 @@
 # go-cpuminer
+
+[<img src="https://img.shields.io/github/license/esrrhs/go-cpuminer">](https://github.com/esrrhs/go-cpuminer)
+[<img src="https://img.shields.io/github/languages/top/esrrhs/go-cpuminer">](https://github.com/esrrhs/go-cpuminer)
+[![Go Report Card](https://goreportcard.com/badge/github.com/esrrhs/go-cpuminer)](https://goreportcard.com/report/github.com/esrrhs/go-cpuminer)
+[<img src="https://img.shields.io/github/v/release/esrrhs/go-cpuminer">](https://github.com/esrrhs/go-cpuminer/releases)
+[<img src="https://img.shields.io/github/downloads/esrrhs/go-cpuminer/total">](https://github.com/esrrhs/go-cpuminer/releases)
+[<img src="https://img.shields.io/docker/pulls/esrrhs/go-cpuminer">](https://hub.docker.com/repository/docker/esrrhs/go-cpuminer)
+[<img src="https://img.shields.io/github/workflow/status/esrrhs/go-cpuminer/Go">](https://github.com/esrrhs/go-cpuminer/actions)
+
 go-cpuminer是go实现的cpu挖矿工具
 
 # 特性
