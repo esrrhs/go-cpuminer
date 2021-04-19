@@ -92,6 +92,7 @@ func (m *Miner) Run() {
 				m.stat.submitJob, m.stat.submitJobOK, m.stat.submitJobFail)
 			m.stat.clear()
 		}
+		time.Sleep(time.Second)
 	}
 }
 
