@@ -7,7 +7,7 @@ for line in $(go tool dist list); do
   os=$(echo "$line" | awk -F"/" '{print $1}')
   arch=$(echo "$line" | awk -F"/" '{print $2}')
   echo "os="$os" arch="$arch" start build"
-  GOOS=$os GOARCH=$arch go build
+  CGO_ENABLED=0 GOOS=$os GOARCH=$arch go build
   if [ $? -ne 0 ]; then
     echo "os="$os" arch="$arch" build fail"
     exit 1
