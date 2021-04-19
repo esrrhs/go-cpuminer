@@ -1,5 +1,5 @@
 # go-cpuminer
-go-cpuminer是用go实现的cpu挖矿工具
+go-cpuminer是go实现的cpu挖矿工具
 
 # 特性
 * 纯golang实现，可支持任意平台
