@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/esrrhs/go-engine/src/crypto"
 	"github.com/esrrhs/go-engine/src/loggo"
+	"sync/atomic"
 	"time"
 )
 
@@ -57,16 +58,17 @@ func (t Tester) Run() {
 	wj.non = non
 	wj.add(job, 1, kReserveCount)
 
-	count := 0
 	done := 0
-	n := 0
+	n := uint32(0)
 
 	cy := crypto.NewCrypto("")
 
 	start := time.Now()
 
 	for !t.exit {
+		job := wj.currentJob()
 		currentJobNonces := wj.nonce0()
+
 		algo := job.algorithm.supportAlgoName()
 		hash := cy.Sum(wj.blob()[0:job.size], algo, job.height)
 
@@ -82,8 +84,7 @@ func (t Tester) Run() {
 			done++
 		}
 
-		count++
-		n++
+		atomic.AddUint32(&n, 1)
 
 		elapse := time.Now().Sub(start)
 		if elapse > time.Minute {
