@@ -51,10 +51,10 @@ Comparison with XMRIG's hash speed
 * https://github.com/xmrig/xmrig
 * https://github.com/gurupras/go-cryptonight-miner
 * https://github.com/gurupras/go-stratum-client
-* https://git.dero.io/dero_foundation/randomx
-* https://haven.herominers.com/# how-to-mine-haven-xhv
-* https://github.com/tevador/randomx
-* https://Medium.com/novamining/in-depth-analysis-on-stratum-protocol-and-its-known-vulnerabilities-3ef139495608
+* https://git.dero.io/DERO_Foundation/RandomX
+* https://haven.herominers.com/#how-to-mine-haven-xhv
+* https://github.com/tevador/RandomX
+* https://medium.com/novamining/in-depth-analysis-on-stratum-protocol-and-its-known-vulnerabilities-3ef139495608
 * https://zhuanlan.zhihu.com/p/34441197
-* https://github.com/equim-chan/cryptonight
+* https://github.com/Equim-chan/cryptonight
 * https://www.cs.cmu.edu/~dga/crypto/xmr/cryptonight.png
