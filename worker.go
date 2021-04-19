@@ -94,6 +94,6 @@ func (w *Worker) setJob(j *Job, sequence uint64, non *Nonce) {
 	wj.add(j, sequence, kReserveCount)
 	w.lock.Lock()
 	w.wj = wj
-	loggo.Debug("worker add done %v", sequence)
 	w.lock.Unlock()
+	loggo.Debug("worker add done %v", sequence)
 }
