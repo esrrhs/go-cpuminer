@@ -10,6 +10,8 @@
 
 go-cpuminer是go实现的cpu挖矿工具
 
+[Readme EN](./README_EN.md)
+
 # 特性
 * 纯golang实现，可支持任意平台
 * 支持的算法：cn/0，cn/1，cn/2，cn/r，cn/fast，cn/half，cn/xao，cn/rto，cn/rwz，cn/double，cn-lite/0，cn-lite/1，cn-heavy/0，cn-heavy/tube，cn-heavy/xhv，cn-pico，cn-pico/tlo
