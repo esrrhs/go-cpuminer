@@ -29,6 +29,12 @@ go-cpuminer是go实现的cpu挖矿工具
 ./go-cpuminer -type test -algo cn-heavy/xhv
 ```
 
+# 性能
+与xmrig的哈希速度比较
+|    platform    | xmrig     | go-cpuminer   |
+| ------ | -------- | -------- | 
+| linux amd64 | 31H/s | 18H/s | 
+
 # 参考
 * https://github.com/sammy007/monero-stratum
 * https://github.com/decred/gominer
