@@ -1,14 +1,24 @@
 #! /bin/bash
-set -x
+#set -x
 NAME="go-cpuminer"
 rm *.zip -f
 
-os_all='linux windows darwin freebsd'
-arch_all='386 amd64 arm arm64 mips64 mips64le mips mipsle'
-
-for os in $os_all; do
-  for arch in $arch_all; do
-    GOOS=$os GOARCH=$arch go build
-    zip ${NAME}_${os}_${arch}".zip" $NAME
-  done
+for line in $(go tool dist list); do
+  os=$(echo "$line" | awk -F"/" '{print $1}')
+  arch=$(echo "$line" | awk -F"/" '{print $2}')
+  echo "os="$os" arch="$arch" start build"
+  GOOS=$os GOARCH=$arch go build
+  if [ $? -ne 0 ]; then
+    echo "os="$os" arch="$arch" build fail"
+    exit 1
+  fi
+  zip ${NAME}_"${os}"_"${arch}"".zip" $NAME
+  if [ $? -ne 0 ]; then
+    echo "os="$os" arch="$arch" zip fail"
+    exit 1
+  fi
+  echo "os="$os" arch="$arch" done build"
 done
+
+echo "all done"
+
