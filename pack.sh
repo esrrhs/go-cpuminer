@@ -76,5 +76,7 @@ for line in $build_list; do
   echo "os="$os" arch="$arch" done build"
 done
 
+zip pack.zip pack/ -r
+
 echo "all done"
 
