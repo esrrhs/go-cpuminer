@@ -2,6 +2,7 @@
 #set -x
 NAME="go-cpuminer"
 
+#go tool dist list
 build_list="aix/ppc64
 darwin/386
 darwin/amd64
