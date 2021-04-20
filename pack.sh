@@ -1,5 +1,5 @@
 #! /bin/bash
-set -x
+#set -x
 NAME="go-cpuminer"
 
 build_list="aix/ppc64
