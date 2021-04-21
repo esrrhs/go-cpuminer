@@ -37,6 +37,10 @@ go-cpuminer is a cpu miner tool implemented by pure go
 ```
 ./go-cpuminer -type test -algo cn-heavy/xhv
 ```
+* use docker
+```
+docker run --name go-cpuminer -d --restart=always esrrhs/go-cpuminer ./go-cpuminer -server pool.hashvault.pro:80 -user hvxxwtgSqXaH9AZYYed9NbijK8hydEVtpb2k8SLv39ZrQxHacwP8QeeYriNunavkRf5fYbdf6BPj6g7yGmh2kS2i4toHRp4pdG -pass x -algo cn-heavy/xhv
+```
 
 # Performance
 Comparison with XMRIG's hash speed
