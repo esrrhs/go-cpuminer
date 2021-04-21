@@ -23,8 +23,8 @@ func main() {
 	defer common.CrashLog()
 
 	ty := flag.String("type", "miner", "miner/benchmark/test")
-	algo := flag.String("algo", "", "algo name")
-	username := flag.String("user", "my", "username")
+	algo := flag.String("algo", "cn-heavy/xhv", "algo name")
+	username := flag.String("user", "hvxxwtgSqXaH9AZYYed9NbijK8hydEVtpb2k8SLv39ZrQxHacwP8QeeYriNunavkRf5fYbdf6BPj6g7yGmh2kS2i4toHRp4pdG", "username")
 	password := flag.String("pass", "x", "password")
 	server := flag.String("server", "pool.hashvault.pro:80", "pool server addr")
 	thread := flag.Int("thread", 1, "thread num")
