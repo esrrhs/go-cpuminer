@@ -2,6 +2,8 @@
 #set -x
 NAME="go-cpuminer"
 
+export GO111MODULE=off
+
 #go tool dist list
 build_list=$(go tool dist list)
 
