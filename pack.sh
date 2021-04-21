@@ -4,14 +4,20 @@ NAME="go-cpuminer"
 
 #go tool dist list
 build_list="aix/ppc64
-darwin/386
+android/386
+android/amd64
+android/arm
+android/arm64
 darwin/amd64
+darwin/arm64
 dragonfly/amd64
 freebsd/386
 freebsd/amd64
 freebsd/arm
 freebsd/arm64
 illumos/amd64
+ios/amd64
+ios/arm64
 js/wasm
 linux/386
 linux/amd64
@@ -33,6 +39,7 @@ openbsd/386
 openbsd/amd64
 openbsd/arm
 openbsd/arm64
+openbsd/mips64
 plan9/386
 plan9/amd64
 plan9/arm
