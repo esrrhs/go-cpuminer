@@ -51,6 +51,11 @@ docker run --name go-cpuminer -d --restart=always esrrhs/go-cpuminer ./go-cpumin
 | ------ | -------- | -------- | 
 | linux amd64 | 31H/s | 18H/s | 
 
+# 代码结构
+powered by [GoCity](https://go-city.github.io/)
+[![Goby 3D Visualization](./struct.png)](https://go-city.github.io/#/github.com/esrrhs/go-cpuminer)
+
+
 # 参考
 * https://github.com/sammy007/monero-stratum
 * https://github.com/decred/gominer
