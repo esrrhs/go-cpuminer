@@ -11,8 +11,6 @@ rm pack -rf
 rm pack.zip -f
 mkdir pack
 
-go get -u -v github.com/esrrhs/go-cpuminer/...
-
 for line in $build_list; do
   os=$(echo "$line" | awk -F"/" '{print $1}')
   arch=$(echo "$line" | awk -F"/" '{print $2}')
