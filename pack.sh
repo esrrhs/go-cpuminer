@@ -11,7 +11,7 @@ rm pack -rf
 rm pack.zip -f
 mkdir pack
 
-go get -u -v github.com/go-cpuminer/spp/...
+go get -u -v github.com/esrrhs/go-cpuminer/...
 last=`pwd`
 cd $GOPATH/src/golang.org/x
 for dir in `ls`; do
