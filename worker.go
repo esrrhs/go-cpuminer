@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/binary"
-	"github.com/esrrhs/go-engine/src/crypto"
-	"github.com/esrrhs/go-engine/src/loggo"
+	"github.com/esrrhs/gohome/crypto"
+	"github.com/esrrhs/gohome/loggo"
 	"sync"
 	"sync/atomic"
 	"time"

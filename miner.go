@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/esrrhs/go-engine/src/common"
-	"github.com/esrrhs/go-engine/src/crypto"
-	"github.com/esrrhs/go-engine/src/loggo"
+	"github.com/esrrhs/gohome/common"
+	"github.com/esrrhs/gohome/crypto"
+	"github.com/esrrhs/gohome/loggo"
 	"github.com/pkg/errors"
 	"time"
 )

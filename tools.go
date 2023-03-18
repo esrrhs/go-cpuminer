@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/hex"
-	"github.com/esrrhs/go-engine/src/loggo"
+	"github.com/esrrhs/gohome/loggo"
 )
 
 func fromHexWithBuffer(data []byte, s string) bool {

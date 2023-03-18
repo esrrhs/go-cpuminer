@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"github.com/esrrhs/go-engine/src/common"
-	"github.com/esrrhs/go-engine/src/loggo"
+	"github.com/esrrhs/gohome/common"
+	"github.com/esrrhs/gohome/loggo"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
