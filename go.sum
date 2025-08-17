@@ -5,6 +5,8 @@ github.com/esrrhs/gohome v0.0.0-20250426022937-504d912bccf7 h1:EpgZzfBgtv89nRgnp
 github.com/esrrhs/gohome v0.0.0-20250426022937-504d912bccf7/go.mod h1:4kAeSdLmMeWMOpzi/Jx82YvDnrBHcbWcLT18FwTujFA=
 github.com/esrrhs/gohome v0.0.0-20250816144729-abdcfb8eae20 h1:3igcRRlggkGBTL+KmxrcY2Su8ur7ngJ5Xut/ZTcw+gQ=
 github.com/esrrhs/gohome v0.0.0-20250816144729-abdcfb8eae20/go.mod h1:lgcmfeT6GcGuTsPkunaca3NTFstzGIJhNdYY2Sj5DZk=
+github.com/esrrhs/gohome v0.0.0-20250817065232-0c1b36efd742 h1:zzdo0JCyswDtAG31d69bxOZTTR9OX16BfS7xhWBLEzA=
+github.com/esrrhs/gohome v0.0.0-20250817065232-0c1b36efd742/go.mod h1:lgcmfeT6GcGuTsPkunaca3NTFstzGIJhNdYY2Sj5DZk=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
