@@ -3,7 +3,7 @@ module github.com/esrrhs/go-cpuminer
 go 1.24.4
 
 require (
-	github.com/esrrhs/gohome v0.0.0-20250816144729-abdcfb8eae20
+	github.com/esrrhs/gohome v0.0.0-20250817065232-0c1b36efd742
 	github.com/pkg/errors v0.9.1
 )
 
