@@ -135,57 +135,26 @@ func NewAlgorithm(algo string) *Algorithm {
 }
 
 func (a *Algorithm) family() int {
-
 	switch a.id {
-	case CN_0:
-	case CN_1:
-	case CN_2:
-	case CN_R:
-	case CN_FAST:
-	case CN_HALF:
-	case CN_XAO:
-	case CN_RTO:
-	case CN_RWZ:
-	case CN_ZLS:
-	case CN_DOUBLE:
-	case CN_CCX:
+	case CN_0, CN_1, CN_2, CN_R, CN_FAST, CN_HALF, CN_XAO, CN_RTO, CN_RWZ, CN_ZLS, CN_DOUBLE, CN_CCX:
 		return CN
-
-	case CN_LITE_0:
-	case CN_LITE_1:
+	case CN_LITE_0, CN_LITE_1:
 		return CN_LITE
-
-	case CN_HEAVY_0:
-	case CN_HEAVY_TUBE:
-	case CN_HEAVY_XHV:
+	case CN_HEAVY_0, CN_HEAVY_TUBE, CN_HEAVY_XHV:
 		return CN_HEAVY
-
-	case CN_PICO_0:
-	case CN_PICO_TLO:
+	case CN_PICO_0, CN_PICO_TLO:
 		return CN_PICO
-
-	case RX_0:
-	case RX_WOW:
-	case RX_ARQ:
-	case RX_SFX:
-	case RX_KEVA:
+	case RX_0, RX_WOW, RX_ARQ, RX_SFX, RX_KEVA:
 		return RANDOM_X
-
-	case AR2_CHUKWA:
-	case AR2_CHUKWA_V2:
-	case AR2_WRKZ:
+	case AR2_CHUKWA, AR2_CHUKWA_V2, AR2_WRKZ:
 		return ARGON2
-
 	case ASTROBWT_DERO:
 		return ASTROBWT
 	case KAWPOW_RVN:
 		return KAWPOW
-
 	default:
-		break
+		return UNKNOWN
 	}
-
-	return UNKNOWN
 }
 
 func (a *Algorithm) name() string {
