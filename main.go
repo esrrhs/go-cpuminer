@@ -2,8 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/esrrhs/gohome/common"
-	"github.com/esrrhs/gohome/loggo"
+	"fmt"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -11,6 +10,9 @@ import (
 	"runtime/pprof"
 	"strconv"
 	"time"
+
+	"github.com/esrrhs/gohome/common"
+	"github.com/esrrhs/gohome/loggo"
 )
 
 type Runner interface {
@@ -35,8 +37,15 @@ func main() {
 	profile := flag.Int("profile", 0, "open profile")
 	cpuprofile := flag.String("cpuprofile", "", "open cpuprofile")
 	memprofile := flag.String("memprofile", "", "open memprofile")
+	showVersion := flag.Bool("v", false, "show version and build info")
+	showVersionLong := flag.Bool("version", false, "show version and build info")
 
 	flag.Parse()
+
+	if *showVersion || *showVersionLong {
+		fmt.Println("go-cpuminer " + GetVersionInfo())
+		return
+	}
 
 	level := loggo.LEVEL_INFO
 	if loggo.NameToLevel(*loglevel) >= 0 {
@@ -49,7 +58,7 @@ func main() {
 		NoLogFile: *nolog > 0,
 		NoPrint:   *noprint > 0,
 	})
-	loggo.Info("start...")
+	loggo.Info("start... (%s)", GetVersionInfo())
 
 	if *profile > 0 {
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(*profile), nil)

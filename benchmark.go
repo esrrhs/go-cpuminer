@@ -1,14 +1,16 @@
 package main
 
 import (
+	"time"
+
 	"github.com/esrrhs/gohome/crypto"
 	"github.com/esrrhs/gohome/loggo"
 	"github.com/pkg/errors"
-	"time"
 )
 
 type Benchmark struct {
 	exit  bool
+	once  bool
 	algos []*Algorithm
 }
 
@@ -20,7 +22,7 @@ func NewBenchmark(algo string) (*Benchmark, error) {
 		algos = append(algos, algo)
 	}
 
-	b := &Benchmark{}
+	b := &Benchmark{once: algo == "all"}
 
 	for _, alname := range algos {
 		al := NewAlgorithm(alname)
@@ -44,8 +46,8 @@ func (b *Benchmark) Stop() {
 }
 
 func (b *Benchmark) Run() {
-	var input [kMaxBlobSize]byte
-	for i, _ := range input {
+	input := make([]byte, 76)
+	for i := range input {
 		input[i] = byte(i)
 	}
 
@@ -53,21 +55,28 @@ func (b *Benchmark) Run() {
 
 	for !b.exit {
 		for _, al := range b.algos {
+			name := al.supportAlgoName()
 			start := time.Now()
 			n := 0
-			for i := 0; i < 1024 && !b.exit; i++ {
-				cy.Sum(input[:], al.supportAlgoName(), 0)
+			for !b.exit {
+				cy.Sum(input, name, 0)
 				n++
-				if time.Now().Sub(start) > time.Second*5 {
+				if time.Since(start) >= 8*time.Second {
 					break
 				}
 			}
-			elapse := time.Now().Sub(start)
-			speed := float32(n) / float32(elapse/time.Second)
-			loggo.Info("Benchmark Algo=%v HashSpeed=%v/s", al.supportAlgoName(), speed)
+			elapse := time.Since(start).Seconds()
+			if elapse <= 0 {
+				elapse = 1
+			}
+			speed := float64(n) / elapse
+			loggo.Info("Benchmark Algo=%v HashSpeed=%.2f/s", name, speed)
 			if b.exit {
 				break
 			}
+		}
+		if b.once || b.exit {
+			break
 		}
 	}
 }
