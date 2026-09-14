@@ -1,6 +1,6 @@
 module github.com/esrrhs/go-cpuminer
 
-go 1.26.0
+go 1.27.0
 
 require (
 	github.com/esrrhs/gohome v0.0.0-20260914110951-165384768827
