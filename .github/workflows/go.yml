@@ -28,7 +28,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24.4'
+          go-version: '1.26.8'
 
       - name: Build
         shell: bash
@@ -99,7 +99,7 @@ jobs:
         if: steps.check_version.outputs.should_release == 'true'
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24.4'
+          go-version: '1.26.8'
 
       - name: Build release artifacts
         if: steps.check_version.outputs.should_release == 'true'
