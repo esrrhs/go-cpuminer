@@ -17,3 +17,6 @@
 # Release artifacts
 pack/
 pack.zip
+
+# macOS
+.DS_Store
